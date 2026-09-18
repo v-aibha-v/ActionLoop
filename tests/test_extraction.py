@@ -28,7 +28,7 @@ from app.core.exceptions import (
     LLMResponseError,
     TranscriptTooLongError,
 )
-from app.models.action_item import Priority
+from app.models.action_item import ExtractedActionItem, Priority
 from tests.conftest import (
     FakeAsyncAnthropic,
     FakeResponse,
@@ -174,6 +174,8 @@ async def test_non_object_tool_input_is_rejected(settings: Settings) -> None:
     [
         {"title": "A valid looking title"},  # missing confidence
         sample_extraction(confidence=5.0),  # confidence out of range
+        sample_extraction(confidence=90),  # bare number: ambiguous scale, not a ratio
+        sample_extraction(confidence="90"),  # same ambiguity written as a string
         sample_extraction(priority="whenever"),  # unknown priority
         sample_extraction(deadline="some time in Q4"),  # unparseable deadline
         sample_extraction(title="a"),  # title too short
@@ -187,6 +189,29 @@ async def test_invalid_structured_output_is_rejected(
 
     with pytest.raises(ExtractionValidationError):
         await agent.extract("Vaibhav: prepare the report.")
+
+
+@pytest.mark.parametrize(
+    ("raw", "expected"),
+    [
+        (0.9, 0.9),
+        ("0.9", 0.9),
+        ("90%", 0.9),  # an explicit percent marker is the only unambiguous signal
+        (" 95 % ", 0.95),
+        ("100%", 1.0),
+        (0, 0.0),
+        ("-", 0.0),  # a nullish placeholder means "no confidence reported"
+    ],
+)
+def test_confidence_is_normalised_only_when_the_scale_is_unambiguous(
+    raw: Any, expected: float
+) -> None:
+    """A declared percentage is rescaled; a bare out-of-range number is not guessed at."""
+    item = ExtractedActionItem(
+        title="Prepare benchmark report", source_context="context", confidence=raw
+    )
+
+    assert item.confidence == pytest.approx(expected)
 
 
 async def test_invalid_envelope_is_rejected(settings: Settings) -> None:

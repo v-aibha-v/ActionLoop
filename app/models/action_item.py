@@ -4,7 +4,7 @@ Two models, on purpose
 ----------------------
 ``ExtractedActionItem`` is the *contract with Claude*. It is deliberately tolerant:
 it normalises the small spelling/format variations an LLM inevitably produces
-("2026-09-25", ``null`` owner, a confidence expressed as ``90`` instead of ``0.9``)
+(``"2026-09-25"``, ``null`` owner, a confidence expressed as ``"90%"`` instead of ``0.9``)
 so a cosmetic difference does not throw away a genuinely good extraction.
 
 ``ActionItem`` is the *domain entity*. It is strict (``extra="forbid"``), owns an
@@ -127,25 +127,46 @@ def normalise_priority(value: Any) -> Any:
 
 
 def normalise_confidence(value: Any) -> Any:
+    """Validate a model-reported confidence and return it on the 0-1 ratio scale.
+
+    A percentage is rescaled **only when the value declares itself one** with a
+    trailing ``%``. A bare ``90`` is deliberately *rejected* rather than guessed at:
+    "a 0-100 percentage", "a 0-10 score" and "a typo for 0.9" are all equally
+    plausible readings, and silently choosing one is exactly the kind of downgrade
+    that hides a prompt regression. Requiring the explicit marker keeps the useful
+    convenience (``"90%"`` -> ``0.9``) without inventing data.
+    """
     if isinstance(value, bool):  # bool is an int subclass; reject it explicitly
         raise ValueError("Confidence must be a number between 0 and 1.")
+
+    is_percent = False
     if isinstance(value, str):
-        text = value.strip().rstrip("%")
+        text = value.strip()
+        is_percent = text.endswith("%")
+        if is_percent:
+            text = text[:-1].strip()
         if text.lower() in _NULLISH:
             return 0.0
         try:
             value = float(text)
         except ValueError as exc:
             raise ValueError(f"Confidence must be numeric, got {value!r}.") from exc
-    if isinstance(value, (int, float)):
-        number = float(value)
-        # Claude occasionally answers in percent (90) instead of a ratio (0.9).
-        if 1.0 < number <= 100.0:
-            number = number / 100.0
-        if not 0.0 <= number <= 1.0:
-            raise ValueError("Confidence must be between 0 and 1.")
-        return number
-    raise ValueError(f"Unsupported confidence type {type(value).__name__}.")
+
+    if not isinstance(value, (int, float)):
+        raise ValueError(f"Unsupported confidence type {type(value).__name__}.")
+
+    number = float(value)
+    if is_percent:
+        if not 0.0 <= number <= 100.0:
+            raise ValueError(f"Confidence must be between 0% and 100%, got {value!r}.")
+        return number / 100.0
+
+    if not 0.0 <= number <= 1.0:
+        raise ValueError(
+            f"Confidence must be between 0 and 1, got {value!r}. "
+            'A percentage must say so explicitly, e.g. "90%".'
+        )
+    return number
 
 
 def normalise_optional_text(value: Any) -> Any:
