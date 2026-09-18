@@ -1,0 +1,60 @@
+# ---------------------------------------------------------------------------
+# Secrets and credentials -- NEVER commit any of these.
+# ---------------------------------------------------------------------------
+.env
+.env.*
+!.env.example
+.secrets/
+credentials.json
+client_secret*.json
+*token*.json
+*.pem
+*.key
+
+# ---------------------------------------------------------------------------
+# Local data (SQLite databases, exported artifacts)
+# ---------------------------------------------------------------------------
+*.db
+*.sqlite
+*.sqlite3
+data/
+
+# ---------------------------------------------------------------------------
+# Python
+# ---------------------------------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+.eggs/
+build/
+dist/
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+coverage.xml
+htmlcov/
+
+# ---------------------------------------------------------------------------
+# Local scratch files (ad-hoc probes / logs from local debugging, not the app)
+# ---------------------------------------------------------------------------
+_smoke.py
+_check*.txt
+_deps.txt
+_install.log
+_probe.txt
+_pytest.txt
+_smoke.txt
+_tree.txt
+
+# ---------------------------------------------------------------------------
+# Editors / OS
+# ---------------------------------------------------------------------------
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,34 @@
+[project]
+name = "actionloop"
+version = "0.1.0"
+description = "AI-powered meeting action-item automation with a human-in-the-loop approval gate."
+readme = "README.md"
+requires-python = ">=3.12"
+authors = [{ name = "Vaibhav" }]
+keywords = ["fastapi", "claude", "llm", "google-calendar", "gmail", "human-in-the-loop"]
+
+# Runtime and test dependencies are declared in requirements.txt so that there is
+# exactly one place to install from (`pip install -r requirements.txt`).
+
+[tool.pytest.ini_options]
+minversion = "8.0"
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-ra --strict-markers"
+markers = ["integration: tests that exercise more than one layer of the stack"]
+filterwarnings = [
+    # Starlette 1.x nudges towards `httpx2`; TestClient still works and pinning a
+    # brand-new HTTP client is not worth it for this project.
+    "ignore:Using `httpx` with `starlette.testclient` is deprecated:DeprecationWarning",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["app", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM", "C4"]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = ["S101"]
