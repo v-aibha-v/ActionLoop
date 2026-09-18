@@ -1,0 +1,26 @@
+{
+  "items": [
+    {
+      "id": "0f0a3f2e-6d2a-4a19-9a5e-2a7c9a1b3d41",
+      "transcript_id": "b2c1e4d0-5f3a-4c8e-9b7d-1a2b3c4d5e6f",
+      "title": "Prepare benchmark report",
+      "description": "Write up the Q3 database benchmark findings for the customer calls context.",
+      "owner": "Vaibhav",
+      "deadline": "2026-09-25T17:00:00Z",
+      "priority": "high",
+      "source_context": "I will prepare the benchmark report and I will have it ready by September 25.",
+      "confidence": 0.95,
+      "status": "approved",
+      "calendar_event_id": "1a2b3c4d5e6f7g8h",
+      "calendar_event_link": "https://www.google.com/calendar/event?eid=1a2b3c4d",
+      "gmail_draft_id": "r-1234567890",
+      "last_error": null,
+      "created_at": "2026-09-18T15:00:00Z",
+      "updated_at": "2026-09-18T15:20:00Z",
+      "approved_at": "2026-09-18T15:20:00Z",
+      "rejected_at": null,
+      "executed_at": "2026-09-18T15:21:00Z"
+    }
+  ],
+  "total": 1
+}

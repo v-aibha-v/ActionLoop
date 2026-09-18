@@ -1,0 +1,63 @@
+Q3 Benchmark Review - Data Platform Sync
+Date: September 18, 2026
+Attendees: Vaibhav (Engineering Lead), Priya (Platform), Dana (Data), Marcus (Product)
+
+Vaibhav: Thanks for joining. The goal today is to close out the Q3 benchmark
+review and agree who is doing what before we wrap up. Let's start with the
+database comparison.
+
+Priya: I finished the first pass on the read-heavy workload numbers. Postgres 16
+is about 12% faster than MySQL on the same hardware, and the p99 latency is much
+steadier under load.
+
+Vaibhav: That is a bigger gap than I expected. What about the write path?
+
+Priya: The write path is basically a wash. The interesting difference is
+operational, not performance.
+
+Marcus: So are we switching?
+
+Vaibhav: Yes - let's make the call now: we will go with the managed Postgres
+offering for the new pipeline. That is a decision, not a task, so someone should
+still write it down in the design doc.
+
+Dana: I can put the decision in the design doc.
+
+Vaibhav: Great. Dana, can you also share the dashboard mockups with the team?
+
+Dana: Sure. I do not have a date for that yet, I want to finish the aggregate
+query work first.
+
+Vaibhav: That is fine, just get them out when you can.
+
+Priya: One thing that is still open: the staging cluster is on Postgres 13 and we
+cannot test the new query planner on it. Someone needs to upgrade staging to 16
+before we can trust these numbers.
+
+Vaibhav: Priya, can you own that? Ideally before the end of next week.
+
+Priya: Yes. I will take it and get it done by next Friday.
+
+Vaibhav: Dana, the benchmark report itself - can you take that one?
+
+Dana: Actually I think Vaibhav should write it, he has the context from the
+customer calls.
+
+Vaibhav: Fair. I will prepare the benchmark report and I will have it ready by
+September 25.
+
+Marcus: The customer success team will ask about this. Do we have anything for
+them?
+
+Vaibhav: Good point. We need a short client-facing summary of the findings. No
+single owner yet - I will figure out who writes it, but let's target the end of
+the month so it goes out with the monthly update.
+
+Marcus: Also, honestly, I am not sure the cost numbers in the appendix are
+right. Someone should probably double-check them at some point.
+
+Vaibhav: Noted, low priority. Anything else?
+
+Priya: Nothing from me.
+
+Vaibhav: Then let's close. Thanks everyone.
