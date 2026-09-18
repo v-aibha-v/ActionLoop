@@ -50,7 +50,9 @@ def test_extracted_item_cannot_execute(container: Any, google_fakes: Any, stored
     assert google_fakes.total_creates == 0, "an unapproved item must not reach Google"
 
 
-def test_rejected_item_can_never_execute(container: Any, google_fakes: Any, stored_item: Any) -> None:
+def test_rejected_item_can_never_execute(
+    container: Any, google_fakes: Any, stored_item: Any
+) -> None:
     """Rejection is terminal, so a rejected item is permanently inert."""
     container.approval_service.reject(stored_item.id)
 
