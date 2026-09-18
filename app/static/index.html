@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ActionLoop — Human-in-the-loop action item review</title>
+  <link rel="stylesheet" href="/static/styles.css" />
+</head>
+<body>
+  <header class="topbar">
+    <div>
+      <h1>ActionLoop</h1>
+      <p class="tagline">Transcript → Claude extraction → your approval → Calendar &amp; Gmail</p>
+    </div>
+    <div class="topbar__right">
+      <span id="google-status" class="pill pill--muted">Google: checking…</span>
+      <button id="connect-google" type="button" class="btn btn--ghost">Connect Google</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="panel">
+      <h2>1. Meeting transcript</h2>
+      <p class="hint">
+        Nothing leaves this machine except the transcript text sent to the Claude API.
+        No Google Calendar or Gmail action happens until you approve an item below.
+      </p>
+      <form id="transcript-form">
+        <label class="field">
+          <span>Meeting title</span>
+          <input id="transcript-title" type="text" placeholder="Q3 Benchmark Review" />
+        </label>
+        <label class="field">
+          <span>Meeting date <small>(used to resolve “by next Friday”)</small></span>
+          <input id="transcript-date" type="date" />
+        </label>
+        <label class="field">
+          <span>Transcript</span>
+          <textarea id="transcript-content" rows="14" placeholder="Paste the meeting transcript here…"></textarea>
+        </label>
+        <div class="actions">
+          <button id="extract" type="submit" class="btn btn--primary">Extract action items</button>
+          <button id="load-sample" type="button" class="btn btn--ghost">Load sample transcript</button>
+        </div>
+      </form>
+      <p id="transcript-feedback" class="feedback" hidden></p>
+    </section>
+
+    <section class="panel">
+      <div class="panel__head">
+        <h2>2. Review, edit, approve or reject</h2>
+        <button id="refresh" type="button" class="btn btn--ghost">Refresh</button>
+      </div>
+      <p class="hint">
+        Approving stores your decision. Creating the Calendar event and Gmail draft
+        happens only when you press <strong>Execute approved item</strong> on an
+        approved item.
+      </p>
+      <div id="items" class="items"></div>
+      <p id="items-empty" class="empty">No action items yet. Extract a transcript to begin.</p>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>
