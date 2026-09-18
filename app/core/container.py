@@ -15,6 +15,8 @@ from dataclasses import dataclass
 
 from app.agents.extraction_agent import ExtractionAgent
 from app.core.config import Settings, get_settings
+from app.core.exceptions import ActionLoopError
+from app.core.logging import get_logger
 from app.db.database import Database
 from app.integrations.google_auth import GoogleOAuthManager, build_google_service
 from app.integrations.google_calendar import CalendarClient, GoogleCalendarClient
@@ -59,6 +61,9 @@ class AppContainer:
     extraction_service: ExtractionService
     approval_service: ApprovalService
     execution_service: ExecutionService
+    # Kept on the container (rather than only inside GmailService) so the status
+    # endpoint can ask Google *which account* is connected.
+    gmail_client_factory: Callable[[], GmailClient]
 
     @classmethod
     def build(
@@ -81,10 +86,8 @@ class AppContainer:
             or default_calendar_client_factory(oauth, settings),
             settings=settings,
         )
-        gmail = GmailService(
-            client_provider=gmail_client_factory or default_gmail_client_factory(oauth, settings),
-            settings=settings,
-        )
+        gmail_factory = gmail_client_factory or default_gmail_client_factory(oauth, settings)
+        gmail = GmailService(client_provider=gmail_factory, settings=settings)
 
         return cls(
             settings=settings,
@@ -94,7 +97,26 @@ class AppContainer:
             extraction_service=ExtractionService(database, agent, settings),
             approval_service=ApprovalService(database),
             execution_service=ExecutionService(database, calendar, gmail),
+            gmail_client_factory=gmail_factory,
         )
+
+    def connected_google_account(self) -> str | None:
+        """The signed-in Google address, or ``None`` when it cannot be determined.
+
+        Deliberately best-effort. This value decorates a status badge, so an expired
+        token or a Gmail hiccup must degrade to "unknown" instead of turning the
+        health/status endpoint into a failure.
+        """
+        if not self.oauth.is_authenticated():
+            return None
+        try:
+            return self.gmail_client_factory().get_user_email()
+        except ActionLoopError:
+            get_logger(__name__).warning(
+                "Could not read the connected Google account",
+                extra={"provider": "gmail", "operation": "read_profile"},
+            )
+            return None
 
     def initialize_schema(self) -> None:
         """Create tables if they do not exist yet.

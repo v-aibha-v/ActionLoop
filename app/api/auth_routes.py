@@ -69,10 +69,15 @@ def google_oauth_callback(
     summary="Whether Google credentials are configured and usable",
 )
 def google_status(container: ContainerDep) -> GoogleStatusResponse:
+    """Reports the integration state *and* which Google account is signed in.
+
+    The account is best-effort: see ``AppContainer.connected_google_account``.
+    """
     return GoogleStatusResponse(
         configured=container.oauth.is_configured,
         authenticated=container.oauth.is_authenticated(),
         scopes=list(container.settings.google_scopes),
+        connected_email=container.connected_google_account(),
     )
 
 

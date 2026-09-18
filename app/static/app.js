@@ -333,7 +333,9 @@ async function refreshGoogleStatus() {
       dom.googleStatus.textContent = 'Google: not configured';
       dom.googleStatus.className = 'pill pill--muted';
     } else if (status.authenticated) {
-      dom.googleStatus.textContent = 'Google: connected';
+      dom.googleStatus.textContent = status.connected_email
+        ? `Google: ${status.connected_email}`
+        : 'Google: connected';
       dom.googleStatus.className = 'pill pill--ok';
     } else {
       dom.googleStatus.textContent = 'Google: not connected';
